@@ -1,3 +1,10 @@
+#### Preamble ####
+# Purpose: Get data on Toronto Language Services data during the 2021 year and make a table
+# Author: Emily Kim
+# Email: emilyuna.kim@mail.utoronto.ca
+# Date: 28 January 2023
+# Pre-req: None
+
 #### Workspace set-up ####
 install.packages("opendatatoronto")
 install.packages("lubridate")
@@ -10,6 +17,7 @@ library(lubridate)
 library(opendatatoronto)
 library(tidyverse)
 
+#### Simulate ####
 set.seed(853)
 
 simulated_languageduration_data <-
