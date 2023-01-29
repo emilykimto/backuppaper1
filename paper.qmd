@@ -9,4 +9,19 @@ format: pdf
 bibliography: references.bib
 ---
 
-## 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+library(janitor)
+library(lubridate)
+library(opendatatoronto)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+```
+
+# Introduction
+
+In
