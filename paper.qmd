@@ -43,7 +43,6 @@ First, I grouped the data by language using `group_by` before using the function
 
 I discovered that the based on the data from 2014-2021, out of these top ten languages, the three most used languages in emergency services based on duration were Mandarin, Cantonese, and Russian. Please refer to [@tbl-overyears].
 
-\newpage
 
 However, this contradicts the language composition data from the 2021 Census of Toronto [@toronto2021census], which showed the top five languages spoken at home to be Mandarin, Cantonese, Tagalog, Spanish, and Tamil. According to the Census, among the Top 15 Mother Tongue Languages in the City of Toronto {excluding Official Languages), Mandarin was ranked first, Cantonese second, and Russian tenth, making up 4.1%, 3.7%, and 1.2% of Toronto, respectively. There seems to be a significant discrepancy between the usage of Russian as a mother tongue in the census and its call duration in this analysis.
 
@@ -93,14 +92,12 @@ top_10_languages <-
 
 #### Create table ####
 top_10_languages |>
-   knitr::kable(caption = "Top 10 languages based on the total duration of calls requiring language services", 
-               col.names = c("Language", "Duration"),
+   knitr::kable(col.names = c("Language", "Duration"),
                align = c('l', 'l'),
                booktabs = T) |>
-  kable_styling(full_width = T) |>
   column_spec(1, width = "10cm")
-
 ```
+
 
 Next, to better understand the usage of different languages in emergency calls over the years, I want to create a line graph visualizing fluctuations between 2014 to 2021 using `ggplot2` [@citeggplot2]. First, I used `tidyverse` [@citetidyverse] and `lubridate` [@lubridate] to change the "Time Stamp" column in the data set into date-format. Afterwards, I excluded rows with missing or NA values in the "Time Stamp" column using `filter`. This resulted in a data set containing 26,225 rows of emergency instances, while the original had 27,673 rows. One important limitation of this line graph is its inability to address these rows: 1,448 calls.
 
@@ -113,7 +110,7 @@ Next, to better understand the usage of different languages in emergency calls o
 language_services_cleaned <- language_services |>
   mutate(Timestamp = as.POSIXct(`Time Stamp`, format = "%m/%d/%Y %H:%M:%S")) |>
   filter(!is.na(Timestamp)
-)
+  )
 
 # Save file
 write_csv(
@@ -136,8 +133,8 @@ I selected the top ten languages for the line graph and filtered to include only
 
 # Selecting the top 10 languages for the line graph
 graph_languages <- c("ARABIC", "CANTONESE", "FARSI", "HUNGARIAN", 
-                            "ITALIAN", "MANDARIN", "PORTUGESE", "RUSSIAN", 
-                            "SPANISH", "TAMIL")
+                     "ITALIAN", "MANDARIN", "PORTUGESE", "RUSSIAN", 
+                     "SPANISH", "TAMIL")
 
 # Filter the data to include only the selected languages
 language_services_cleaned_filtered <-
@@ -156,10 +153,7 @@ ggplot(data = language_services_by_year, aes(x = year, y = cumulative_duration, 
   labs(x = "Year",
        y = "Cumulative Duration (in minutes)") +
   scale_x_discrete(limits = c("2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021"))
-
 ```
-
-\newpage
 
 # Results
 
@@ -170,9 +164,11 @@ My analysis of the Toronto Paramedic Services data on emergency language interpr
 # Discussion
 
 ## Limitations
+
 There are several limitations to this report. First, the data set was last refreshed on February 2, 2022, which may result in data that does not accurately reflect the most recent emergency call data - particularly for the 2022 year. Further, [@fig-overyears] was unable to address 1,448 emergency calls with missing values in the "Time Stamp" column, which may impact the accuracy of the data analysis. Some ethical considerations of this report include the potential to reveak information that may be sensitive for those communities impacted by the results. This results of this report should not be used to discriminate or make assumptions regarding any particular group based on their language or ethnicity.
 
 ## Moving forward
+
 Despite these limitations and other considerations, this data highlights the language diversity in Toronto and the necessity for equitable access to emergency services. Its insights can be used to inform the development of programs and policies aimed at improving the quality and accessibility of emergency language services for Toronto's many ethnic communities. Particularly for those who speak Mandarin and Cantonese, who have been shown to consistently require additional language support in emergency situations. Additionally, it is important to note that the data analysis in this report shows Russian as the third most used language in emergency services, whereas the 2021 Census ranked Russian tenth in the list of top mother tongue languages [@toronto2021census]. Moreover, my analysis indicated a recent spike increase in Spanish speakers seeking language interpretation services.
 
 This disparity in representation as well as the sharp change in consistency in the recent 2021 year highlights the importance of considering multiple sources of data to better understand the ever-evolving linguistic needs of a diverse city. As more data is collected in the future, we can further monitor the trend of language usage over time to identify any fluctuations and create opportunities for proactive planning. This way, the city can better provide for its residents in forms of re-allocation of appropriate resources and adequate training for emergency service providers, thereby improving public safety and outcomes.
@@ -180,3 +176,4 @@ This disparity in representation as well as the sharp change in consistency in t
 \newpage
 
 # References
+

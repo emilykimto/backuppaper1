@@ -1,0 +1,99 @@
+---
+title: "Evaluating the Necessity of Language Translation Services for Emergency Dispatch Calls in Toronto"
+subtitle: "How We Might Make Language Services More Accessible to Toronto's Diverse Communities"
+author: "Emily Kim"
+thanks: "Code and data are available at https://github.com/emilykimto/Language-Services.git"
+date: "`r Sys.time()`"
+date-format: "D MMMM YYYY"
+abstract: "Toronto is a city known for its diverse immigrant communities, resulting in a variety of non-English first languages being spoken. This diversity can create challenges for emergency services to provide efficient support in time-sensitive situations. This report aims to examine the usage of designated language translation services by Toronto Paramedic Services’ Emergency Medical Dispatchers during 911 calls from 2014 to 2021. By analyzing this data, we have discovered that Cantonese, Mandarin, and Russian are the top three languages in need of improved accessibility to specific language services during emergencies, with Spanish on an upward trend."
+format: pdf
+bibliography: references.bib
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+# install.packages
+library(knitr)
+library(janitor)
+library(lubridate)
+library(opendatatoronto)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(kableExtra)
+```
+
+# Introduction
+
+Toronto is Canada's most diverse city, with nearly half of the city's population being immigrants from all around the world. Within this urban diversity are people from countries where the dominant language is not English. One important consequence of this phenomenon is the inability for these individuals to clearly express their crisis in an emergency situation, such as during a 911 call. Communication difficulties can lead to misunderstandings, and the caller may not be able to provide all the necessary information to the operator which can result in confusion and delay. Particularly in the event that they require health services, linguistic barriers can result in a life-threatening situation. Recent research studies by linguists show that during the COVID-19 global pandemic, the integration of emergency language services in the COVID-19 response helped greatly reduce the spread of the virus [@Dreisbach2020]. Similarly, for an ethnically diverse city like Toronto, being able to accommodate those with limited English proficiency can help minimize the potential harm in emergency situations. Language interpreting services such as those offered by Toronto's Paramedic Services 911 are crucial to ensuring accurate communication, timely and effective delivery of emergency services, and improving outcomes.
+
+As Toronto experiences a growing immigrant population, there is an increasing demand for emergency interpretation services that can accommodate the diverse linguistic backgrounds of the city's residents. This report aims to explore this need by analyzing the City of Toronto's paramedic language services data to uncover which communities have the most demand for emergency interpretation services. I will determine the top languages requiring the most cumulative sum of interpretation services duration (in minutes) between 2014-2021. Then, I will compare the top languages with highest call duration results with fluctuations over the eight year period to uncover a more recent trend in language usage.
+
+By examining the trend of language-specific calls between 2014-2021, we can gain a deeper understanding of the city's evolving linguistic needs. This information can then inform the allocation of resources, such as staff and time, to improve the quality and accessibility of emergency services for Toronto's many ethnic communities.
+
+# Data
+
+The data used in this report was collected by the Toronto Paramedic Services [@languageservices] from the Toronto Open Data portal [@opendatatoronto]. It was last refreshed on February 2, 2022, and updates yearly. The data set contains information on the date, time, language, and duration in minutes of instances when a caller required language interpretation. Using `R` [@citeR], `tidyverse` [@citetidyverse], and `dplyr` [@dplyr], I began my analysis.
+
+First, I grouped the data by language using `group_by` before using the function `summarize` from the `dplyr` package to calculate the sum of duration for each language presented in the data. This resulted in a new data frame with one row for each language paired with the sum of all durations for that language. With this new data frame, I renamed the "total_duration" column to "Total Duration" using the `rename()` function for further clarity. I wanted to find the top ten languages in the data set that had the highest total call duration, so I used the `top_n` function after which I arranged the data by "Total Duration" in descending order using `arrange`. This created a final table consisting of the top ten languages requiring the most language interpretation assistance during emergency calls using `knitr` [@knitr] and `kableExtra` [@kableExtra], please refer to @tbl-toplanguages.
+
+\newpage
+
+```{r, include=FALSE}
+#### Acquire the dataset from Toronto Open Data ####
+language_services <-
+  # https://open.toronto.ca/dataset/paramedic-services-911-language-interpretation/
+  list_package_resources("42315239-36a8-4b7f-b2ab-6ab60fb0b935") |>
+  filter(name == "Language Services Data (2014 - 2021)") |>
+  get_resource()
+
+#### Saving the dataset ####
+write_csv(
+  x = language_services,
+  file = "language_services.csv"
+)
+
+read.csv("language_services.csv")
+```
+
+```{r, include=FALSE}
+#### Calculate the sum of call duration for each language ####
+language_services_summary <-
+  language_services |>
+  group_by(Language) |>
+  summarize(total_duration = sum(Duration))
+
+head(language_services_summary)
+
+#### Rename "total_duration" column to "Total Duration" ####
+language_services_summary <-
+  language_services_summary |>
+  rename("Total Duration" = total_duration)
+```
+
+```{r, include=FALSE}
+#### Find the top 10 languages that require language services ####
+top_10_languages <-
+  language_services_summary |>
+  arrange(desc("Total Duration")) |>
+  top_n(10)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: tbl-toplanguages
+#| tbl-cap: "Top 10 languages based on the total duration of calls requiring language services"
+
+#### Create table ####
+top_10_languages |>
+   knitr::kable(caption = "Top 10 languages based on the total duration of calls requiring language services", 
+               col.names = c("Language", "Duration"),
+               align = c('l', 'l'),
+               booktabs = T) |>
+  kable_styling(full_width = T) |>
+  column_spec(1, width = "12cm")
+
+```
